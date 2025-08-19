@@ -19,12 +19,11 @@ jobs:
           distribution: "temurin"
           java-version: "21"
 
-      - name: Maven Test
-        run: ./mvnw test
-
-      - name: Checkstyle
-        run: ./mvnw checkstyle:check
-
+      - name: Maven Test 
+        run: mvn test 
+        
+      - name: Checkstyle 
+        run: mvn checkstyle:checkstyle
   sonarqube:
     runs-on: ubuntu-latest
     needs: Testing

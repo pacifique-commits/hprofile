@@ -107,15 +107,15 @@ jobs:
         id: task-def
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
-          task-definition: ${{ env.ECS_TASK_DEFINITION }}
-          container-name: ${{ env.CONTAINER_NAME }}
-          image: ${{ secrets.REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest
+          task-definition: ${{ env.ECS_TASK_DEFINITION}}
+          container-name: ${{ env.CONTAINER_NAME}}
+          image: ${{ secrets.REGISTRY}}/${{ env.ECR_REPOSITORY}}:latest }}:${{ github.run_number }}
 
       - name: Run Task on Amazon ECS
         uses: smitp/amazon-ecs-run-task@v1
         with:
           task-definition: ${{ steps.task-def.outputs.task-definition }}
-          cluster: ${{ env.ECS_CLUSTER }}
+          service: ${{ env.ECS_SERVICE}}
+          cluster: ${{ env.ECS_CLUSTER}}
           count: 1
-          started-by: github-actions-${{ github.actor }}
-          wait-for-finish: true
+          wait-for-service-stability: true

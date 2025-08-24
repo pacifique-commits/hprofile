@@ -22,7 +22,7 @@ jobs:
       - name: Set up JDK 11
         uses: actions/setup-java@v4
         with:
-          distribution: "temurin" # Povider
+          distribution: "temurin" # Provider
           java-version: "11" # version
       - name: SonarQube Scan
         uses: sonarsource/sonarqube-scan-action@master
@@ -88,34 +88,18 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION}}
 
-      # - name: Login to Amazon ECR
-      #   id: login-ecr
-      #   uses: aws-actions/amazon-ecr-login@v1
-
-      # - name: Build, tag, and push image to Amazon ECR
-      #   id: build-image
-      #   env:
-      #     ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-      #     ECR_REPOSITORY: my-ecr-repo
-      #     IMAGE_TAG: ${{ github.sha }}
-      #   run: |
-      #     docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-      #     docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-      #     echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
-
       - name: Fill in the new image ID in the Amazon ECS task definition
         id: task-def
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
           task-definition: ${{ env.ECS_TASK_DEFINITION}}
           container-name: ${{ env.CONTAINER_NAME}}
-          image: ${{ secrets.REGISTRY}}/${{ env.ECR_REPOSITORY}}:latest }}:${{ github.run_number }}
+          image: ${{ secrets.REGISTRY}}/${{ env.ECR_REPOSITORY}}:${{ github.run_number }}
 
-      - name: Run Task on Amazon ECS
-        uses: smitp/amazon-ecs-run-task@v1
+      - name: Deploy Amazon ECS task definition
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
         with:
           task-definition: ${{ steps.task-def.outputs.task-definition }}
           service: ${{ env.ECS_SERVICE}}
           cluster: ${{ env.ECS_CLUSTER}}
-          count: 1
           wait-for-service-stability: true
